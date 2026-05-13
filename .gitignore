@@ -12,3 +12,6 @@ Makefile*
 # Binary
 GPXSee
 gpxsee
+
+build/
+.qtcreator/
