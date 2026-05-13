@@ -30,9 +30,10 @@
 #include <QTabBar>
 #include <QPushButton>
 #include <QGeoPositionInfoSource>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)) \
+  && (defined(Q_OS_ANDROID) || defined(Q_OS_MAC))
 #include <QPermissions>
-#endif // QT 6.5
+#endif // QT 6.5 && (Q_OS_ANDROID || Q_OS_MAC)
 #include "common/config.h"
 #include "common/programpaths.h"
 #include "common/util.h"
