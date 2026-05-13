@@ -69,6 +69,7 @@ public:
 signals:
 	void tilesLoaded();
 	void mapLoaded();
+	void loadingProgress(int percent);
 
 private:
 	QString _path;

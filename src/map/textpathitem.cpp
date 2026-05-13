@@ -376,8 +376,9 @@ void TextPathItem::paint(QPainter *painter) const
 			painter->setPen(*_haloColor);
 
 			for (int i = 0; i < _text->size(); i++) {
-				QPointF point = _path.pointAtPercent(percent);
-				qreal angle = _path.angleAtPercent(percent);
+				qreal p = qMax(0.0, qMin(1.0, percent));
+				QPointF point = _path.pointAtPercent(p);
+				qreal angle = _path.angleAtPercent(p);
 				QChar c = _text->at(i);
 
 				painter->translate(point);
@@ -400,8 +401,9 @@ void TextPathItem::paint(QPainter *painter) const
 
 		painter->setPen(*_color);
 		for (int i = 0; i < _text->size(); i++) {
-			QPointF point = _path.pointAtPercent(percent);
-			qreal angle = _path.angleAtPercent(percent);
+			qreal p = qMax(0.0, qMin(1.0, percent));
+			QPointF point = _path.pointAtPercent(p);
+			qreal angle = _path.angleAtPercent(p);
 
 			painter->translate(point);
 			painter->rotate(-angle);

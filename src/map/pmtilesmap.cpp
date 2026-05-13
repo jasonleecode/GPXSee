@@ -4,6 +4,7 @@
 #include <QPixmapCache>
 #include <QImageReader>
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -18,6 +19,17 @@
 using namespace PMTiles;
 using namespace MVT;
 using namespace OSM;
+
+static void pmtilesProgress(int percent, void *data)
+{
+	static_cast<PMTilesMap*>(data)->emitLoadingProgress(percent);
+}
+
+void PMTilesMap::emitLoadingProgress(int percent)
+{
+	emit loadingProgress(percent);
+	QCoreApplication::processEvents();
+}
 
 PMTilesMap::PMTilesMap(const QString &fileName, QObject *parent)
   : Map(fileName, parent), _file(fileName), _style(0), _mapRatio(1.0),
@@ -75,7 +87,8 @@ PMTilesMap::PMTilesMap(const QString &fileName, QObject *parent)
 	}
 
 	// root directory
-	_root = readDir(_file, hdr.rootOffset, hdr.rootLength, hdr.ic);
+	_root = readDir(_file, hdr.rootOffset, hdr.rootLength, hdr.ic,
+	  pmtilesProgress, this);
 	if (_root.isEmpty()) {
 		_errorString = "Error reading root directory";
 		return;

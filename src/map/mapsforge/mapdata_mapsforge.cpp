@@ -219,9 +219,18 @@ bool MapData::readTags(SubFile &subfile, int count,
 	return true;
 }
 
-bool MapData::readSubFiles(QFile &file)
+bool MapData::readSubFiles(QFile &file, void (*progress)(int, void*), void *data)
 {
 	QDataStream stream(&file);
+	int totalTiles = 0;
+	int processedTiles = 0;
+
+	for (int i = 0; i < _subFiles.size(); i++) {
+		const SubFileInfo &f = _subFiles.at(i);
+		QPoint tl(OSM::ll2tile(_bounds.topLeft(), f.base));
+		QPoint br(OSM::ll2tile(_bounds.bottomRight(), f.base));
+		totalTiles += (br.x() - tl.x() + 1) * (br.y() - tl.y() + 1);
+	}
 
 	for (int i = 0; i < _subFiles.size(); i++) {
 		const SubFileInfo &f = _subFiles.at(i);
@@ -240,6 +249,10 @@ bool MapData::readSubFiles(QFile &file)
 
 		for (int h = tl.y(); h <= br.y(); h++) {
 			for (int w = tl.x(); w <= br.x(); w++) {
+				processedTiles++;
+				if (progress && !(processedTiles % 10000))
+					progress(processedTiles * 100 / totalTiles, data);
+
 				if (!(h == br.y() && w == br.x())) {
 					if (!readOffset(stream, nextOffset)
 					  || (nextOffset & OFFSET_MASK) > f.size)
@@ -456,7 +469,7 @@ RectC MapData::bounds() const
 	return RectC(ctl, _bounds.bottomRight());
 }
 
-void MapData::load()
+void MapData::load(void (*progress)(int, void*), void *data)
 {
 	QFile file(_fileName);
 
@@ -464,7 +477,7 @@ void MapData::load()
 		qWarning("%s: %s", qUtf8Printable(file.fileName()),
 		  qUtf8Printable(file.errorString()));
 	else
-		readSubFiles(file);
+		readSubFiles(file, progress, data);
 }
 
 void MapData::clear()

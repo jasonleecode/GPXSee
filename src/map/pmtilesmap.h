@@ -41,7 +41,12 @@ public:
 	bool isValid() const {return _valid;}
 	QString errorString() const {return _errorString;}
 
+	void emitLoadingProgress(int percent);
+
 	static Map *create(const QString &path, const Projection &proj, bool *isDir);
+
+private:
+	void load();
 
 private slots:
 	void jobFinished(MVTJob *job);

@@ -1,5 +1,6 @@
 #include <QFile>
 #include <QDataStream>
+#include <QCoreApplication>
 #include "common/util.h"
 #include "pmtiles.h"
 
@@ -93,7 +94,7 @@ QByteArray PMTiles::readData(QFile &file, quint64 offset, quint64 size,
 }
 
 QVector<PMTiles::Directory> PMTiles::readDir(QFile &file, quint64 offset,
-  quint64 size, quint8 compression)
+  quint64 size, quint8 compression, void (*progress)(int, void*), void *data)
 {
 	QByteArray uba(readData(file, offset, size, compression));
 	if (uba.isNull())
@@ -108,23 +109,40 @@ QVector<PMTiles::Directory> PMTiles::readDir(QFile &file, quint64 offset,
 	QVector<Directory> dirs;
 	dirs.resize(n);
 	for (int i = 0; i < dirs.size(); i++) {
+		if (progress && !(i % 1000))
+			progress(i * 100 / dirs.size() / 4, data);
+		else if (!(i % 1000))
+			QCoreApplication::processEvents();
 		quint64 tileId;
 		if (!varint(&bp, be, tileId))
 			return QVector<Directory>();
 		dirs[i].tileId = i ? tileId + dirs[i-1].tileId : tileId;
 	}
-	for (int i = 0; i < dirs.size(); i++)
+	for (int i = 0; i < dirs.size(); i++) {
+		if (progress && !(i % 1000))
+			progress(25 + i * 100 / dirs.size() / 4, data);
+		else if (!(i % 1000))
+			QCoreApplication::processEvents();
 		if (!varint(&bp, be, dirs[i].runLength))
 			return QVector<Directory>();
-	for (int i = 0; i < dirs.size(); i++)
+	}
+	for (int i = 0; i < dirs.size(); i++) {
+		if (progress && !(i % 1000))
+			progress(50 + i * 100 / dirs.size() / 4, data);
+		else if (!(i % 1000))
+			QCoreApplication::processEvents();
 		if (!varint(&bp, be, dirs[i].length))
 			return QVector<Directory>();
+	}
 	for (int i = 0; i < dirs.size(); i++) {
+		if (progress && !(i % 1000))
+			progress(75 + i * 100 / dirs.size() / 4, data);
+		else if (!(i % 1000))
+			QCoreApplication::processEvents();
 		quint64 offset;
 		if (!varint(&bp, be, offset))
 			return QVector<Directory>();
-		dirs[i].offset = offset
-		  ? offset - 1 : dirs[i-1].offset + dirs[i-1].length;
+		dirs[i].offset = i ? offset + dirs[i-1].offset + dirs[i-1].length : offset;
 	}
 
 	return dirs;

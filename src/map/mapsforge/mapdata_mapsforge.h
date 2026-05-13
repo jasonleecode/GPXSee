@@ -69,7 +69,7 @@ public:
 	  int zoom, QList<Path> *set);
 	unsigned tagId(const QByteArray &name) const {return _keys.value(name);}
 
-	void load();
+	void load(void (*progress)(int, void*) = 0, void *data = 0);
 	void clear();
 
 	bool isValid() const {return _valid;}
@@ -149,7 +149,7 @@ private:
 	bool readTagInfo(SubFile &hdr, QVector<TagSource> &tags);
 	bool readMapInfo(SubFile &hdr, QByteArray &projection, bool &debugMap);
 	bool readHeader(QFile &file);
-	bool readSubFiles(QFile &file);
+	bool readSubFiles(QFile &file, void (*progress)(int, void*), void *data);
 	void clearTiles();
 
 	int level(int zoom) const;

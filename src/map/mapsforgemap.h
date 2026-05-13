@@ -80,6 +80,8 @@ public:
 	bool isValid() const {return _data.isValid();}
 	QString errorString() const {return _data.errorString();}
 
+	void emitLoadingProgress(int percent);
+
 	static Map *create(const QString &path, const Projection &proj, bool *isMap);
 
 private slots:

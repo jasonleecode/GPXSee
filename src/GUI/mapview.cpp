@@ -7,6 +7,7 @@
 #include <QClipboard>
 #include <QOpenGLWidget>
 #include <QGeoPositionInfoSource>
+#include <QProgressDialog>
 #include "data/poi.h"
 #include "data/data.h"
 #include "map/map.h"
@@ -453,9 +454,16 @@ void MapView::setMap(Map *map)
 		_layer = -1;
 	}
 
+	emit loadingProgress(0);
+	auto conn = connect(map, &Map::loadingProgress, this, &MapView::loadingProgress);
+
 	_map = map;
 	_map->load(_inputProjection, _outputProjection, _deviceRatio, _hidpi,
 	  _hillShading, _style, _layer);
+
+	disconnect(conn);
+	emit loadingProgress(-1);
+
 	connect(_map, &Map::tilesLoaded, this, &MapView::reloadMap);
 
 	digitalZoom(0);

@@ -22,6 +22,7 @@ class QTabWidget;
 class QActionGroup;
 class QAction;
 class QLabel;
+class QProgressBar;
 class QSplitter;
 class QPrinter;
 class QGeoPositionInfoSource;
@@ -97,6 +98,8 @@ private slots:
   && (defined(Q_OS_ANDROID) || defined(Q_OS_MAC))
 	void showPosition(bool show);
 #endif // QT 6.5 && (Q_OS_ANDROID || Q_OS_MAC)
+
+	void showLoadingProgress(int percent);
 
 	void mapChanged(QAction *action);
 	void graphChanged(int);
@@ -339,6 +342,7 @@ private:
 	QLabel *_fileNameLabel;
 	QLabel *_distanceLabel;
 	QLabel *_timeLabel;
+	QProgressBar *_progressBar;
 
 	QSplitter *_splitter;
 	MapView *_mapView;

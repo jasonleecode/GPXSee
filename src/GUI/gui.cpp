@@ -13,7 +13,9 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QToolBar>
+#include <QProgressBar>
 #include <QTabWidget>
+#include <QProgressDialog>
 #include <QActionGroup>
 #include <QAction>
 #include <QLabel>
@@ -964,6 +966,7 @@ void GUI::createMapView()
 	_map = new EmptyMap(this);
 
 	_mapView = new MapView(_map, _poi, this);
+	connect(_mapView, &MapView::loadingProgress, this, &GUI::showLoadingProgress);
 	_mapView->setSizePolicy(QSizePolicy(QSizePolicy::Ignored,
 	  QSizePolicy::Expanding));
 #ifdef Q_OS_ANDROID
@@ -1010,7 +1013,13 @@ void GUI::createStatusBar()
 	_distanceLabel->setAlignment(Qt::AlignHCenter);
 	_timeLabel->setAlignment(Qt::AlignHCenter);
 
+	_progressBar = new QProgressBar();
+	_progressBar->setRange(0, 100);
+	_progressBar->setVisible(false);
+	_progressBar->setMaximumWidth(200);
+
 	statusBar()->addPermanentWidget(_fileNameLabel, 8);
+	statusBar()->addPermanentWidget(_progressBar, 2);
 	statusBar()->addPermanentWidget(_distanceLabel, 1);
 	statusBar()->addPermanentWidget(_timeLabel, 1);
 	statusBar()->setSizeGripEnabled(false);
@@ -2283,6 +2292,16 @@ void GUI::updateStatusBarInfo()
 #ifdef Q_OS_ANDROID
 	statusBar()->setVisible(!_files.isEmpty());
 #endif // Q_OS_ANDROID
+}
+
+void GUI::showLoadingProgress(int percent)
+{
+	if (percent < 0)
+		_progressBar->setVisible(false);
+	else {
+		_progressBar->setValue(percent);
+		_progressBar->setVisible(true);
+	}
 }
 
 void GUI::updateWindowTitle()

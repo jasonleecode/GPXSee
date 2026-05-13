@@ -45,7 +45,7 @@ namespace PMTiles
 	const Directory *findDir(const QVector<Directory> &list,
 	  quint64 tileId);
 	QVector<Directory> readDir(QFile &file, quint64 offset, quint64 size,
-	  quint8 compression);
+	  quint8 compression, void (*progress)(int, void*) = 0, void *data = 0);
 	QByteArray readData(QFile &file, quint64 offset, quint64 size,
 	  quint8 compression);
 	quint64 id(unsigned zoom, const QPoint &tile);

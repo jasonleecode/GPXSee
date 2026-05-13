@@ -1,6 +1,7 @@
 #include <QPainter>
 #include <QPixmapCache>
 #include <QDir>
+#include <QCoreApplication>
 #include "common/wgs84.h"
 #include "common/util.h"
 #include "common/programpaths.h"
@@ -26,6 +27,17 @@ MapsforgeMap::~MapsforgeMap()
 	delete _style;
 }
 
+static void mapsforgeProgress(int percent, void *data)
+{
+	static_cast<MapsforgeMap*>(data)->emitLoadingProgress(percent);
+}
+
+void MapsforgeMap::emitLoadingProgress(int percent)
+{
+	emit loadingProgress(percent);
+	QCoreApplication::processEvents();
+}
+
 void MapsforgeMap::load(const Projection &in, const Projection &out,
   qreal deviceRatio, bool hidpi, bool hillShading, int style, int layer)
 {
@@ -35,7 +47,7 @@ void MapsforgeMap::load(const Projection &in, const Projection &out,
 	_tileRatio = deviceRatio;
 	_projection = out;
 
-	_data.load();
+	_data.load(mapsforgeProgress, this);
 
 	if (style >= 0 && style < styles().size())
 		_style = new Style(styles().at(style), _data, _tileRatio, layer);

@@ -146,6 +146,8 @@ TreeNode<Map*> MapList::loadDir(const QString &path, const Projection &proj,
 		const QFileInfo &fi = ml.at(i);
 		QString suffix = fi.suffix().toLower();
 
+		QCoreApplication::processEvents();
+
 		if (fi.isDir()) {
 			TreeNode<Map*> child(loadDir(fi.absoluteFilePath(), proj, &tree));
 			if (!child.isEmpty())

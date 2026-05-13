@@ -6,6 +6,7 @@
 #include <QPixmapCache>
 #include <QImageReader>
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QtConcurrentMap>
 #include "common/util.h"
 #include "osm.h"
@@ -45,6 +46,7 @@ SqliteMap::SqliteMap(const QString &fileName, QObject *parent)
 
 	{
 		QSqlQuery query("SELECT min(z), max(z) FROM tiles", _db);
+		QCoreApplication::processEvents();
 		if (!query.first()) {
 			_errorString = "Empty tile set";
 			return;
@@ -63,6 +65,7 @@ SqliteMap::SqliteMap(const QString &fileName, QObject *parent)
 		  " WHERE z = %1").arg(17 - z);
 		QSqlQuery query(sql, _db);
 		query.first();
+		QCoreApplication::processEvents();
 
 		int minX = qMin((1<<z) - 1, qMax(0, query.value(0).toInt()));
 		int minY = qMin((1<<z) - 1, qMax(0, query.value(1).toInt()));

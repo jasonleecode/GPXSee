@@ -135,6 +135,9 @@ public slots:
 	void useStyles(bool use);
 	void drawHillShading(bool draw);
 
+signals:
+	void loadingProgress(int percent);
+
 private slots:
 	void updatePOI();
 	void reloadMap();
